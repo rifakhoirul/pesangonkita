@@ -1,0 +1,14 @@
+{
+  "name": "pesangonkita-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PesangonCVKita (pesangon.cvkita.id) - Kalkulator Pesangon PP 35/2021 & AI Bedah Surat PHK/Resign",
+  "scripts": {
+    "test": "playwright test",
+    "test:unit": "vitest run"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "vitest": "^4.0.13"
+  }
+}

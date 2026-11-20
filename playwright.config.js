@@ -1,0 +1,17 @@
+// Playwright config (PS-001): smoke test scaffold via webServer python http.server
+// (file:// memblokir fetch/font; ES module butuh http://). Viewport acuan DS: 375x812.
+module.exports = {
+  testDir: 'tests',
+  timeout: 15000,
+  webServer: {
+    command: 'python3 -m http.server 8094',
+    port: 8094,
+    reuseExistingServer: true,
+  },
+  use: {
+    baseURL: 'http://localhost:8094',
+    headless: true,
+    viewport: { width: 375, height: 812 }, // mobile-first acuan utama DS §1
+  },
+  reporter: [['list']],
+};
