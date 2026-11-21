@@ -2,6 +2,8 @@
 // (file:// memblokir fetch/font; ES module butuh http://). Viewport acuan DS: 375x812.
 module.exports = {
   testDir: 'tests',
+  // Hanya file *.spec.js (Playwright); *.test.js milik vitest (PS-002).
+  testMatch: '**/*.spec.js',
   timeout: 15000,
   webServer: {
     command: 'python3 -m http.server 8094',
