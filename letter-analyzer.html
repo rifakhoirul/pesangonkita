@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=1">
+  <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body>
   <!-- Header & Navigasi Ringkas (DS §6) -->
@@ -30,15 +30,74 @@
     <h1 class="page-title">AI Bedah Surat PHK/Resign</h1>
     <p class="page-subtitle">Unggah PDF atau tempel teks draf Surat PHK, Perjanjian Bersama (PB), atau Surat Pengunduran Diri. AI memeriksa red flag klausul, verifikasi angka, dan menyiapkan skrip balasan HR.</p>
 
-    <!-- Dropzone PDF + Paywall + Analisis Pro dibangun di task PS-004/PS-005 -->
-    <section class="placeholder-section" data-scaffold="analyzer">
-      <span class="coming-soon-badge">Segera</span>
-      <p>Dropzone PDF, teaser gratis, dan analisis Pro sedang disiapkan. Kerangka halaman ini dibangun di task PS-001; fitur penuh menyusul di PS-004 &amp; PS-005.</p>
+    <!-- PS-004: Input dokumen (PDF lokal via PDF.js / teks tempel) -->
+    <section class="card calc-section" aria-labelledby="analyzer-input-heading">
+      <h2 id="analyzer-input-heading">1. Unggah atau Tempel Surat</h2>
+
+      <div class="pdf-dropzone" id="pdf-dropzone">
+        <p class="dropzone-title">Tarik &amp; letakkan file PDF di sini</p>
+        <p class="dropzone-hint">Teks diekstrak 100% di browser pakai PDF.js — file PDF tidak diunggah ke server.</p>
+        <div class="form-field form-field-full">
+          <label for="input-pdf-file">Atau pilih file PDF surat (maks 5 MB)</label>
+          <input type="file" id="input-pdf-file" accept="application/pdf,.pdf">
+        </div>
+      </div>
+      <p class="field-status" id="pdf-status" role="status" aria-live="polite"></p>
+
+      <div class="form-field form-field-full">
+        <label for="textarea-letter-text">Tempel teks surat (Surat PHK, Perjanjian Bersama, atau Surat Pengunduran Diri)</label>
+        <textarea id="textarea-letter-text" rows="8" placeholder="Contoh: Dengan ini kami beritahukan bahwa terjadi efisiensi sesuai ..."></textarea>
+      </div>
+
+      <div class="action-row">
+        <button type="button" class="btn btn-secondary" id="btn-mask-pii">Samarkan Data Pribadi</button>
+      </div>
+      <p class="field-hint">Tombol ini menyamarkan NIK 16 digit, email, no HP, dan NPWP langsung di browser kamu — sebelum teks dikirim ke AI.</p>
+
+      <p class="field-status" id="analyzer-status" role="status" aria-live="polite"></p>
+
+      <div class="toggle-row consent-row">
+        <input type="checkbox" id="checkbox-pdp-consent">
+        <label for="checkbox-pdp-consent">Saya setuju teks surat dikirim terenkripsi via HTTPS ke server API dan AI (OpenRouter) untuk dianalisis, tidak disimpan di server/KV, dan saya paham imbauan menyamarkan NIK/nama perusahaan dulu.</label>
+      </div>
+
+      <div class="action-row">
+        <button type="button" class="btn" id="btn-run-teaser" disabled>Cek Gratis (Teaser)</button>
+        <button type="button" class="btn" id="btn-run-pro" disabled>Analisis Pro (1 Kuota)</button>
+      </div>
+      <p class="field-hint">Tombol analisis aktif otomatis setelah persetujuan dicentang dan teks minimal 30 karakter.</p>
+    </section>
+
+    <!-- Hasil Free Teaser (maks 3 poin, tanpa memotong kuota) -->
+    <section class="card result-card hidden" id="teaser-result-card" aria-live="polite"></section>
+
+    <!-- Hasil Analisis Pro -->
+    <section class="card result-card hidden" id="pro-result-card" aria-live="polite"></section>
+
+    <!-- Paywall Pro: Rp 29.000 sekali bayar, lisensi PS-XXXX-XXXX (PRD §4) -->
+    <section class="card paywall-card" id="paywall-card" tabindex="-1" aria-labelledby="paywall-heading">
+      <h2 id="paywall-heading">Aktifkan Analisis Pro</h2>
+      <p class="paywall-price-row">
+        <span class="price-label">Sekali bayar (bukan langganan) untuk 5 kuota analisis Pro:</span>
+        <span class="money-value paywall-price">Rp&nbsp;29.000</span>
+      </p>
+      <p class="field-hint">Pembayaran via Midtrans Snap (GoPay/VA). Kode lisensi dikirim otomatis ke email kamu dari kode@cvkita.id.</p>
+      <p class="quota-badge" id="license-quota-badge">Lisensi belum aktif</p>
+      <div class="form-field form-field-full">
+        <label for="input-license-code">Kode lisensi (format PS-XXXX-XXXX)</label>
+        <input type="text" id="input-license-code" placeholder="PS-AB12-CD34" maxlength="13" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="action-row">
+        <button type="button" class="btn" id="btn-activate-license">Aktifkan Lisensi</button>
+        <button type="button" class="btn btn-secondary" id="btn-buy-pro">Beli Lisensi Pro</button>
+      </div>
+      <p class="field-status" id="license-activate-status" role="status" aria-live="polite"></p>
+      <p class="field-status" id="buy-status" role="status" aria-live="polite"></p>
     </section>
 
     <!-- Notice Privasi AI Bedah Surat (PRD §6, UU PDP) — TERPISAH dari kalkulator lokal -->
     <footer class="privacy-notice amber" id="privacy-ai-notice">
-      <strong>Privasi &amp; persetujuan (UU PDP):</strong> teks/ekstraksi PDF surat PHK/resign dikirim terenkripsi melalui HTTPS ke server API dan penyedia AI semata-mata untuk menghasilkan analisis, tidak disimpan di database/KV server. Untuk keamanan, samarkan NIK dan nama perusahaan sebelum mengunggah. Analisis memerlukan persetujuan eksplisit kamu (checkbox UU PDP akan tersedia bersama fitur).
+      <strong>Privasi &amp; persetujuan (UU PDP):</strong> teks/ekstraksi PDF surat PHK/resign dikirim terenkripsi melalui HTTPS ke server API dan penyedia AI (OpenRouter) semata-mata untuk menghasilkan analisis, tidak disimpan di database/KV server. Samarkan dulu NIK dan nama perusahaan sebelum mengirim (tombol "Samarkan Data Pribadi"). Analisis hanya berjalan setelah kamu memberi persetujuan eksplisit lewat checkbox UU PDP di atas. Hasil analisis adalah alat bantu edukasi ketenagakerjaan, bukan nasihat hukum resmi dan bukan pengganti konsultan hukum/advokat maupun mediator Disnaker.
     </footer>
   </main>
 
@@ -54,5 +113,7 @@
       <p>© 2026 PesangonCVKita · Alat bantu simulasi &amp; edukasi ketenagakerjaan, bukan nasihat hukum resmi.</p>
     </div>
   </footer>
+
+  <script src="js/analyzer.js?v=1"></script>
 </body>
 </html>

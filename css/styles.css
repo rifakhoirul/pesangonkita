@@ -575,3 +575,221 @@ input, select {
   font-size: var(--fs-caption);
   color: var(--color-text-secondary);
 }
+
+/* ============================================================
+   PS-004 — AI Bedah Surat PHK/Resign (UI modul, DS v1.0 tetap acuan)
+   ============================================================ */
+
+.pdf-dropzone {
+  margin-top: 12px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-primary-soft);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pdf-dropzone.dragover {
+  border-color: var(--color-primary);
+  background: #CCFBF1;
+}
+
+.dropzone-title {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  color: var(--color-text-primary);
+}
+
+.dropzone-hint,
+.dropzone-note {
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+
+textarea#textarea-letter-text,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  padding: 10px 12px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  resize: vertical;
+}
+
+.field-status {
+  min-height: 20px;
+  margin-top: 8px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+  overflow-wrap: break-word;
+}
+
+.field-status.error { color: var(--color-danger); font-weight: 600; }
+.field-status.ok { color: var(--color-success); font-weight: 600; }
+
+.consent-row { margin-top: 14px; }
+
+.consent-row input[type="checkbox"] {
+  /* Hit area 44px (DS §5): kotak visual 22px via ::before, area sentuh penuh */
+  appearance: none;
+  -webkit-appearance: none;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.consent-row input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  inset: 11px; /* kotak visual 22x22 di tengah hit area 44x44 */
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.consent-row input[type="checkbox"]:checked::before {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  background-position: center;
+}
+
+.consent-row input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.consent-row > label {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.result-card { border-top: 3px solid var(--color-primary); }
+
+.result-card h2 { margin-bottom: 8px; }
+
+.result-card h3 {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.result-list {
+  margin: 6px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--fs-body);
+  color: var(--color-text-primary);
+}
+
+.result-list li { overflow-wrap: break-word; }
+
+.result-list-empty,
+.result-sub-line {
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+.result-score,
+.result-doc-type {
+  margin-top: 12px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.result-upsell {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border);
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.paywall-card {
+  background: var(--color-primary-soft);
+  border: 1px solid #99F6E4;
+  outline: none;
+}
+
+.paywall-card.paywall-highlight {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px #99F6E4;
+}
+
+.paywall-price-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.price-label {
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-wrap: break-word;
+}
+
+.paywall-price {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.quota-badge {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.paywall-hint {
+  margin-top: 10px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+

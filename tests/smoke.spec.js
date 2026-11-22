@@ -5,7 +5,7 @@
 //  - scrollWidth <= clientWidth (zero horizontal overflow)
 //  - ID wajib ada; tap target nav >= 44px; notice privasi terpisah
 //  - Tanpa framework CSS eksternal (Tailwind/Bootstrap CDN dilarang)
-//  - Cache-bust ?v=1 pada CSS (naik per perubahan CSS; kini ?v=2 sejak PS-003)
+//  - Cache-bust ?v=1 pada CSS (naik per perubahan CSS; kini ?v=3 sejak PS-004)
 const { test, expect } = require('@playwright/test');
 
 const PAGES = [
@@ -77,14 +77,14 @@ test.describe('PS-001 scaffold smoke @375x812', () => {
       expect(href).not.toMatch(/tailwindcss|bootstrap/i);
     }
     let appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
-    expect(appCss, 'index harus tepat 1 stylesheet lokal ?v=2').toEqual(['css/styles.css?v=2']);
+    expect(appCss, 'index harus tepat 1 stylesheet lokal ?v=3').toEqual(['css/styles.css?v=3']);
 
-    // letter-analyzer.html: CSS tidak berubah -> tetap ?v=1
+    // letter-analyzer.html: CSS berubah di PS-004 -> ?v=3
     await page.goto('/letter-analyzer.html', { waitUntil: 'networkidle' });
     cssLinks = await page.evaluate(() =>
       Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute('href'))
     );
     appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
-    expect(appCss, 'letter-analyzer harus tepat 1 stylesheet lokal ?v=1').toEqual(['css/styles.css?v=1']);
+    expect(appCss, 'letter-analyzer harus tepat 1 stylesheet lokal ?v=3').toEqual(['css/styles.css?v=3']);
   });
 });
