@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=1">
+  <link rel="stylesheet" href="css/styles.css?v=2">
 </head>
 <body>
   <!-- Header & Navigasi Ringkas (DS §6) -->
@@ -30,10 +30,129 @@
     <h1 class="page-title">Berapa hak pesangon kamu sebenarnya?</h1>
     <p class="page-subtitle">Hitung UP, UPMK, UPH, kompensasi PKWT, dan PPh 21 Final pesangon sesuai PP 35/2021 &amp; PP 68/2009 — instan dan transparan.</p>
 
-    <!-- Kalkulator PKWTT/PKWT & Pembanding dibangun di task PS-003 -->
-    <section class="placeholder-section" data-scaffold="calculator">
-      <span class="coming-soon-badge">Segera</span>
-      <p>Kalkulator pesangon (PKWTT &amp; PKWT) sedang disiapkan. Kerangka halaman ini dibangun di task PS-001; UI kalkulator penuh menyusul di PS-003.</p>
+    <!-- Kalkulator PKWTT/PKWT & Pembanding (PS-003) — 100% client-side -->
+    <section class="calc-section" data-scaffold="calculator" aria-label="Kalkulator pesangon">
+      <div class="card">
+        <h2>1. Data Kepegawaian</h2>
+
+        <div class="mode-switch" role="group" aria-label="Tipe kepegawaian">
+          <label class="segmented" for="mode-pkwtt">
+            <input type="radio" id="mode-pkwtt" name="employment-mode" value="PKWTT" checked>
+            <span>Pegawai Tetap (PKWTT)</span>
+          </label>
+          <label class="segmented" for="mode-pkwt">
+            <input type="radio" id="mode-pkwt" name="employment-mode" value="PKWT">
+            <span>Kontrak (PKWT)</span>
+          </label>
+        </div>
+
+        <div class="field-grid">
+          <div class="form-field">
+            <label for="input-base-salary">Gaji Pokok / Bulan</label>
+            <input type="text" id="input-base-salary" inputmode="numeric" autocomplete="off" placeholder="cth: 5000000">
+          </div>
+          <div class="form-field">
+            <label for="input-fixed-allowance">Tunjangan Tetap / Bulan</label>
+            <input type="text" id="input-fixed-allowance" inputmode="numeric" autocomplete="off" placeholder="cth: 1000000">
+          </div>
+        </div>
+
+        <div id="pkwtt-fields">
+          <div class="field-grid">
+            <div class="form-field">
+              <label for="input-years">Masa Kerja — Tahun</label>
+              <input type="number" id="input-years" inputmode="numeric" min="0" max="45" autocomplete="off" placeholder="cth: 3">
+            </div>
+            <div class="form-field">
+              <label for="input-months">Masa Kerja — Bulan</label>
+              <input type="number" id="input-months" inputmode="numeric" min="0" max="11" autocomplete="off" placeholder="cth: 6">
+            </div>
+            <div class="form-field form-field-full">
+              <label for="select-phk-reason">Alasan PHK</label>
+              <select id="select-phk-reason">
+                <option value="EFISIENSI_RUGI">Efisiensi karena Perusahaan Rugi</option>
+                <option value="EFISIENSI_CEGAH_RUGI">Efisiensi untuk Mencegah Rugi</option>
+                <option value="MERGER_AKUISISI">Merger, Konsolidasi, atau Akuisisi</option>
+                <option value="TUTUP_RUGI">Perusahaan Tutup karena Rugi</option>
+                <option value="PENSIUN">Pensiun</option>
+                <option value="MENINGGAL">Pekerja Meninggal Dunia</option>
+                <option value="SAKIT_BERKEPANJANGAN">Gangguan Kesehatan Berkepanjangan / Cacat</option>
+                <option value="PELANGGARAN_SP">Pelanggaran Tata Tertib setelah Surat Peringatan ke-3</option>
+                <option value="RESIGN">Mengundurkan Diri (Resign)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="pkwt-fields" class="hidden">
+          <div class="field-grid">
+            <div class="form-field">
+              <label for="input-pkwt-months">Masa Kerja Kontrak (bulan)</label>
+              <input type="number" id="input-pkwt-months" inputmode="numeric" min="0" autocomplete="off" placeholder="cth: 12">
+            </div>
+            <div class="form-field hidden" id="pkwt-remaining-field">
+              <label for="input-pkwt-remaining">Sisa Kontrak (bulan)</label>
+              <input type="number" id="input-pkwt-remaining" inputmode="numeric" min="0" autocomplete="off" placeholder="cth: 6">
+            </div>
+            <div class="form-field form-field-full toggle-row">
+              <input type="checkbox" id="toggle-pkwt-early">
+              <label for="toggle-pkwt-early">Diputus sebelum kontrak berakhir</label>
+            </div>
+            <p class="field-hint hidden" id="pkwt-early-note">Diputus sebelum kontrak berakhir: pihak yang memutus wajib membayar ganti rugi sebesar upah sisa masa kontrak (Pasal 15–16 PP 35/2021).</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="form-field">
+            <label for="input-unused-leave">Sisa Cuti Tahunan (hari)</label>
+            <input type="number" id="input-unused-leave" inputmode="numeric" min="0" autocomplete="off" placeholder="cth: 6">
+          </div>
+          <div class="form-field">
+            <label for="input-transport-uph">Ongkos Pulang / UPH Lainnya</label>
+            <input type="text" id="input-transport-uph" inputmode="numeric" autocomplete="off" placeholder="cth: 1500000">
+          </div>
+          <div class="form-field hidden" id="uang-pisah-field">
+            <label for="input-uang-pisah">Uang Pisah (sesuai PP/PKB)</label>
+            <input type="text" id="input-uang-pisah" inputmode="numeric" autocomplete="off" placeholder="cth: 10000000">
+          </div>
+          <div class="form-field">
+            <label for="input-company-offer">Tawaran Perusahaan (opsional)</label>
+            <input type="text" id="input-company-offer" inputmode="numeric" autocomplete="off" placeholder="cth: 25000000">
+          </div>
+        </div>
+        <p class="field-hint">Upah = gaji pokok + tunjangan tetap. Kolom Uang Pisah muncul otomatis untuk skenario Resign &amp; Pelanggaran SP (praktik PP/PKB).</p>
+      </div>
+
+      <div class="card">
+        <h2>2. Hasil Estimasi</h2>
+        <p class="result-caption">Angka estimasi edukasi — bukan nilai final. Rincian mengikuti PP 35/2021 &amp; PP 68/2009.</p>
+
+        <div class="result-hero">
+          <span class="result-hero-label">Total Bersih Diterima (Estimasi)</span>
+          <span class="hero-money" id="result-net-severance">Rp 0</span>
+        </div>
+
+        <div class="result-sub">
+          <div class="breakdown-row"><span class="row-label">Total Bruto</span><span class="money-value" id="result-gross-total">Rp 0</span></div>
+          <div class="breakdown-row"><span class="row-label">PPh 21 Final Pesangon</span><span class="money-value" id="result-tax-total">Rp 0</span></div>
+        </div>
+
+        <div class="breakdown-list" id="result-breakdown-list"></div>
+        <p class="breakdown-empty" id="breakdown-empty">Isi data di atas untuk melihat rincian komponen hakmu.</p>
+
+        <div class="offer-gap-card hidden" id="offer-gap-card">
+          <p class="gap-status"><strong data-gap-status>—</strong></p>
+          <p class="gap-diff"><span class="money-value" data-gap-diff>—</span> <span data-gap-percent></span></p>
+        </div>
+
+        <p class="tax-note" id="tax-note"><strong>Bukti Potong PPh 21 Final:</strong> pemberi kerja tetap wajib menerbitkan bukti potong meskipun pajak terutang Rp 0 (nihil) — PP 68/2009.</p>
+
+        <div class="action-row">
+          <button type="button" class="btn" id="btn-copy-summary">Salin Ringkasan</button>
+          <button type="button" class="btn btn-secondary" id="btn-reset-form">Reset</button>
+        </div>
+        <p class="save-hint">Input terakhir disimpan otomatis di browser kamu (localStorage) — tidak ada data yang dikirim ke server.</p>
+      </div>
     </section>
 
     <!-- Notice Privasi Kalkulator Lokal (PRD §6, UU PDP) -->
@@ -54,5 +173,8 @@
       <p>© 2026 PesangonCVKita · Alat bantu simulasi &amp; edukasi ketenagakerjaan, bukan nasihat hukum resmi.</p>
     </div>
   </footer>
+
+  <script src="js/pesangon-engine.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
 </body>
 </html>

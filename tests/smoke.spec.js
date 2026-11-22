@@ -5,7 +5,7 @@
 //  - scrollWidth <= clientWidth (zero horizontal overflow)
 //  - ID wajib ada; tap target nav >= 44px; notice privasi terpisah
 //  - Tanpa framework CSS eksternal (Tailwind/Bootstrap CDN dilarang)
-//  - Cache-bust ?v=1 pada CSS
+//  - Cache-bust ?v=1 pada CSS (naik per perubahan CSS; kini ?v=2 sejak PS-003)
 const { test, expect } = require('@playwright/test');
 
 const PAGES = [
@@ -48,7 +48,7 @@ test.describe('PS-001 scaffold smoke @375x812', () => {
     });
   }
 
-  test('index & letter-analyzer: nav tap target >= 44px, notice privasi terpisah, tanpa CDN CSS, cache-bust ?v=1', async ({ page }) => {
+  test('index & letter-analyzer: nav tap target >= 44px, notice privasi terpisah, tanpa CDN CSS, cache-bust ?v=2', async ({ page }) => {
     await page.goto('/index.html', { waitUntil: 'networkidle' });
 
     // Tap target nav >= 44px (DS §5)
@@ -65,16 +65,26 @@ test.describe('PS-001 scaffold smoke @375x812', () => {
     const aiNotice = await page.locator('#privacy-ai-notice').innerText();
     expect(aiNotice.toLowerCase()).toContain('terenkripsi');
 
-    // Dilarang framework CSS eksternal; CSS lokal wajib cache-bust ?v=1
+    // Dilarang framework CSS eksternal; CSS lokal wajib cache-bust ?v=N
     // (Google Fonts bukan framework CSS — hanya styling font, diizinkan DS §3)
-    const cssLinks = await page.evaluate(() =>
+    // index.html: CSS berubah di PS-003 (kalkulator) -> ?v=2
+    await page.goto('/index.html', { waitUntil: 'networkidle' });
+    let cssLinks = await page.evaluate(() =>
       Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute('href'))
     );
     expect(cssLinks.length).toBeGreaterThanOrEqual(1);
     for (const href of cssLinks) {
       expect(href).not.toMatch(/tailwindcss|bootstrap/i);
     }
-    const appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
-    expect(appCss, 'harus ada tepat 1 stylesheet lokal').toEqual(['css/styles.css?v=1']);
+    let appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
+    expect(appCss, 'index harus tepat 1 stylesheet lokal ?v=2').toEqual(['css/styles.css?v=2']);
+
+    // letter-analyzer.html: CSS tidak berubah -> tetap ?v=1
+    await page.goto('/letter-analyzer.html', { waitUntil: 'networkidle' });
+    cssLinks = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute('href'))
+    );
+    appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
+    expect(appCss, 'letter-analyzer harus tepat 1 stylesheet lokal ?v=1').toEqual(['css/styles.css?v=1']);
   });
 });

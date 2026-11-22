@@ -334,3 +334,244 @@ input, select {
   /* Grid 2 kolom desktop untuk bagian form/hasil (DS §1) */
   .desktop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 }
+
+/* ============================================================
+   PS-003 — Kalkulator Pesangon (UI modul, DS v1.0 tetap acuan)
+   ============================================================ */
+
+.hidden { display: none !important; }
+
+.calc-section { margin-top: 4px; }
+
+/* Mode switch segmented (DS §6) */
+.mode-switch { display: flex; gap: 8px; margin-top: 12px; }
+
+.segmented {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  width: 100%;
+  padding: 0 10px;
+  font-weight: 600;
+  font-size: var(--fs-body);
+  color: var(--color-text-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.segmented input:checked + span {
+  background: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.segmented input:focus-visible + span {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -4px;
+}
+
+@media (max-width: 400px) {
+  .segmented span {
+    font-size: var(--fs-caption);
+    padding: 0 6px;
+  }
+}
+
+/* Form grid */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 359px) {
+  .field-grid { grid-template-columns: 1fr; }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.form-field > label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.form-field-full { grid-column: 1 / -1; }
+
+.toggle-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  accent-color: var(--color-primary);
+}
+
+.toggle-row > label {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.field-hint {
+  margin-top: 10px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+
+/* Hasil estimasi */
+.result-caption {
+  margin-top: 4px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+.result-hero {
+  margin-top: 14px;
+  background: var(--color-primary-soft);
+  border: 1px solid #99F6E4;
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.result-hero-label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.result-hero .hero-money { color: var(--color-primary); }
+
+.result-sub {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.breakdown-list {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breakdown-row-total {
+  border-top: 1px solid var(--color-border);
+  padding-top: 10px;
+  font-weight: 700;
+}
+
+.breakdown-empty {
+  margin-top: 12px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Pembanding tawaran (gap card) */
+.offer-gap-card {
+  margin-top: 14px;
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  background: var(--color-warning-soft);
+  border: 1px solid #FDE68A;
+}
+
+.offer-gap-card.gap-bad {
+  background: var(--color-danger-soft);
+  border-color: #FECACA;
+}
+
+.offer-gap-card.gap-ok {
+  background: var(--color-success-soft);
+  border-color: #A7F3D0;
+}
+
+.gap-status { font-size: var(--fs-body); color: var(--color-text-primary); }
+
+.gap-diff {
+  margin-top: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+/* Catatan pajak amber (PRD §5.6 wajib) */
+.tax-note {
+  margin-top: 14px;
+  font-size: var(--fs-caption);
+  line-height: 1.45;
+  background: var(--color-warning-soft);
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  border-radius: var(--radius-card);
+  padding: 10px 14px;
+}
+
+/* Aksi */
+.action-row {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-row .btn { flex: 1 1 auto; }
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-hover);
+}
+
+.save-hint {
+  margin-top: 10px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
