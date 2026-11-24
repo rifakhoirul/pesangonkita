@@ -77,14 +77,14 @@ test.describe('PS-001 scaffold smoke @375x812', () => {
       expect(href).not.toMatch(/tailwindcss|bootstrap/i);
     }
     let appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
-    expect(appCss, 'index harus tepat 1 stylesheet lokal ?v=3').toEqual(['css/styles.css?v=3']);
+    expect(appCss, 'index harus tepat 1 stylesheet lokal ?v=4 (PS-007 print CSS)').toEqual(['css/styles.css?v=4']);
 
-    // letter-analyzer.html: CSS berubah di PS-004 -> ?v=3
+    // letter-analyzer.html: CSS berubah di PS-007 (@media print) -> ?v=4
     await page.goto('/letter-analyzer.html', { waitUntil: 'networkidle' });
     cssLinks = await page.evaluate(() =>
       Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute('href'))
     );
     appCss = cssLinks.filter((h) => !h.includes('fonts.googleapis.com'));
-    expect(appCss, 'letter-analyzer harus tepat 1 stylesheet lokal ?v=3').toEqual(['css/styles.css?v=3']);
+    expect(appCss, 'letter-analyzer harus tepat 1 stylesheet lokal ?v=4 (PS-007 print CSS)').toEqual(['css/styles.css?v=4']);
   });
 });

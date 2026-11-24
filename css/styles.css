@@ -793,3 +793,154 @@ textarea {
   line-height: 1.45;
 }
 
+.hr-scripts {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hr-script-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hr-script-text {
+  font-size: var(--fs-body);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.btn-copy-script {
+  align-self: flex-start;
+}
+
+.result-disclaimer {
+  margin-top: 14px;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.print-timestamp {
+  display: none;
+  font-size: var(--fs-caption);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   PS-007 — Print CSS: Cetak/PDF bersih hanya hasil Pro + disclaimer
+   ============================================================ */
+@media print {
+  /* Sembunyikan semua elemen non-esensial (DS §6 + Spec_Summary PS-007) */
+  #app-header,
+  #main-nav,
+  nav,
+  .pdf-dropzone,
+  input,
+  select,
+  textarea,
+  label,
+  .toggle-row,
+  .action-row,
+  .btn,
+  #paywall-card,
+  .paywall-card,
+  #teaser-result-card,
+  .privacy-notice,
+  .site-footer,
+  .field-hint,
+  .field-status,
+  .quota-badge,
+  .copy-btn,
+  .print-btn,
+  #analyzer-input-heading,
+  .calc-section h2,
+  .page-title,
+  .page-subtitle {
+    display: none !important;
+  }
+
+  /* Kertas: margin aman, hitam di atas putih (hemat tinta, teks tajam) */
+  body {
+    background: #FFFFFF !important;
+    color: #111111 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #main-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Kartu hasil Pro: tanpa bayangan/border warna, hasil ke-1 halaman */
+  #pro-result-card {
+    display: block !important;
+    background: #FFFFFF !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  #pro-result-card h2 {
+    color: #111111 !important;
+    page-break-after: avoid;
+  }
+
+  #pro-result-card h3 {
+    color: #111111 !important;
+    page-break-after: avoid;
+    margin-top: 14px !important;
+  }
+
+  #pro-result-card ul,
+  #pro-result-card ol {
+    break-inside: avoid;
+  }
+
+  #pro-result-card li,
+  #pro-result-card p,
+  #pro-result-card .print-disclaimer {
+    color: #111111 !important;
+    line-height: 1.5;
+  }
+
+  /* Disclaimer wajib ikut tercetak di bawah hasil */
+  .print-disclaimer,
+  #pro-result-card .result-disclaimer {
+    display: block !important;
+    margin-top: 16px !important;
+    font-size: 11px !important;
+    border-top: 1px solid #CCCCCC !important;
+    padding-top: 8px !important;
+  }
+
+  /* Tanggal cetak kecil di footer cetakan */
+  .print-timestamp,
+  #pro-result-card .print-timestamp {
+    display: block !important;
+    font-size: 10px !important;
+    color: #666666 !important;
+    margin-top: 6px !important;
+  }
+
+  /* Angka rupiah tidak boleh patah baris di print juga */
+  .money-value {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+}
+

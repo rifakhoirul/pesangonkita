@@ -71,7 +71,7 @@ async function assertNoOverflowAndNoOverlap(page) {
 }
 
 test.describe('PS-004 AI Bedah Surat @375x812', () => {
-  test('15 ID wajib hadir, label eksplisit, notice AI terpisah, cache-bust ?v=3 & analyzer.js?v=1', async ({ page }) => {
+  test('15 ID wajib hadir, label eksplisit, notice AI terpisah, cache-bust ?v=4 & analyzer.js?v=2 (PS-007)', async ({ page }) => {
     await openAnalyzer(page);
 
     for (const id of REQUIRED_IDS) {
@@ -90,15 +90,15 @@ test.describe('PS-004 AI Bedah Surat @375x812', () => {
     // Input file hanya PDF
     expect(await page.getAttribute('#input-pdf-file', 'accept')).toContain('application/pdf');
 
-    // Cache-bust CSS ?v=3 + script analyzer.js?v=1
+    // Cache-bust CSS ?v=4 (PS-007 print CSS) + script analyzer.js?v=2
     const assets = await page.evaluate(() => ({
       css: Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
         .map((l) => l.getAttribute('href'))
         .filter((h) => !h.includes('fonts.googleapis.com')),
       scripts: Array.from(document.querySelectorAll('script[src]')).map((s) => s.getAttribute('src')),
     }));
-    expect(assets.css).toEqual(['css/styles.css?v=3']);
-    expect(assets.scripts).toContain('js/analyzer.js?v=1');
+    expect(assets.css).toEqual(['css/styles.css?v=4']);
+    expect(assets.scripts).toContain('js/analyzer.js?v=2');
   });
 
   test('gate UU PDP: tombol analisis disabled -> enabled setelah consent + teks >=30 char', async ({ page }) => {
@@ -209,6 +209,19 @@ test.describe('PS-004 AI Bedah Surat @375x812', () => {
   });
 
   test('validasi & aktivasi kode lisensi PS-XXXX-XXXX', async ({ page }) => {
+    // PS-007: aktivasi WAJIB verifikasi ke server (GET /api/ps/license-status).
+    await page.route('**/api/ps/license-status**', async (route) => {
+      const code = new URL(route.request().url()).searchParams.get('code');
+      const valid = code === 'PS-AB12-CD34';
+      await route.fulfill({
+        status: valid ? 200 : 404,
+        contentType: 'application/json',
+        body: JSON.stringify(valid
+          ? { ok: true, valid: true, code, quota: 5, status: 'active' }
+          : { ok: false, valid: false, quota: 0 }),
+      });
+    });
+
     await openAnalyzer(page);
 
     // Format salah -> pesan error, tidak tersimpan
@@ -216,12 +229,19 @@ test.describe('PS-004 AI Bedah Surat @375x812', () => {
     await page.click('#btn-activate-license');
     await expect(page.locator('#license-activate-status')).toContainText('tidak valid');
 
-    // Format benar -> tersimpan + badge kuota berubah
+    // Format benar tapi tidak ada di server -> pesan tidak ditemukan, tidak tersimpan
+    await page.fill('#input-license-code', 'PS-ZZ99-ZZ99');
+    await page.click('#btn-activate-license');
+    await expect(page.locator('#license-activate-status')).toContainText('tidak ditemukan');
+    expect(await page.evaluate(() => localStorage.getItem('ps_license_code_v1'))).toBeNull();
+
+    // Format benar & valid di server -> tersimpan + badge kuota real dari server
     await page.fill('#input-license-code', 'PS-AB12-CD34');
     await page.click('#btn-activate-license');
     await expect(page.locator('#license-activate-status')).toContainText('terpasang');
     await expect(page.locator('#license-quota-badge')).toContainText('PS-AB12-CD34');
-    const saved = await page.evaluate(() => localStorage.getItem('ps_license_v1'));
+    await expect(page.locator('#license-quota-badge')).toContainText('5');
+    const saved = await page.evaluate(() => localStorage.getItem('ps_license_code_v1'));
     expect(saved).toBe('PS-AB12-CD34');
   });
 

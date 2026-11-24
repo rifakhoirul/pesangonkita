@@ -76,6 +76,37 @@
 
   function plainNumber(n) { return FMT.format(Math.round(Number(n) || 0)); }
 
+  // ---------- Analytics ringan tanpa PII (PS-007, 0 KV write) ----------
+  // Event names: calc_completed, mode_switched_pkwt, offer_gap_checked.
+  // Props hanya string pendek aman (mode/status) — tanpa gaji/NIK/email.
+  function trackEvent(name, props) {
+    try {
+      var g = typeof globalThis !== 'undefined' ? globalThis : window;
+      if (!g.__psEvents || !Array.isArray(g.__psEvents)) g.__psEvents = [];
+      var safeProps = {};
+      if (props && typeof props === 'object') {
+        var keys = Object.keys(props);
+        for (var i = 0; i < keys.length; i++) {
+          var v = props[keys[i]];
+          if (typeof v === 'boolean') safeProps[keys[i]] = v;
+          else if (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 99999 && v % 1 === 0) safeProps[keys[i]] = v;
+          else if (typeof v === 'string' && v.length > 0 && v.length <= 64) safeProps[keys[i]] = v;
+        }
+      }
+      g.__psEvents.push({ name: String(name), props: safeProps });
+      if (typeof g.gtag === 'function') {
+        try { g.gtag('event', String(name), safeProps); } catch (err) { /* abaikan */ }
+      }
+      if (typeof g.plausible === 'function') {
+        try { g.plausible(String(name), { props: safeProps }); } catch (err) { /* abaikan */ }
+      }
+    } catch (err) { /* analitik tidak boleh memecahkan alur utama */ }
+  }
+
+  // Satu event per sesi perhitungan: emit saat hasil pertama kali muncul
+  // dari input user (bukan render awal dari localStorage), re-arm saat reset.
+  var analyticsState = { calcEmitted: false, lastGapStatus: null };
+
   function mode() { return isChecked('mode-pkwt') ? 'PKWT' : 'PKWTT'; }
 
   function scenarioNeedsUangPisah() {
@@ -178,7 +209,11 @@
     var card = el('offer-gap-card');
     if (!card) return;
     var gap = res && res.gap;
-    if (!gap) { toggleHidden(card, true); return; }
+    if (!gap) {
+      toggleHidden(card, true);
+      analyticsState.lastGapStatus = null;
+      return;
+    }
     toggleHidden(card, false);
     var statusEl = card.querySelector('[data-gap-status]');
     var diffEl = card.querySelector('[data-gap-diff]');
@@ -188,6 +223,12 @@
     setText(diffEl, formatRupiahNoWrap(gap.difference));
     var pct = String(gap.percent).replace('.', ',');
     setText(pctEl, (gap.percent > 0 ? '+' : '') + pct + '% vs hak normatif');
+
+    // PS-007 analytics: offer_gap_checked (hanya saat status berubah, tanpa nominal)
+    if (analyticsState.lastGapStatus !== gap.status) {
+      analyticsState.lastGapStatus = gap.status;
+      trackEvent('offer_gap_checked', { status: String(gap.status), mode: mode() });
+    }
   }
 
   // ---------- Visibilitas field dinamis ----------
@@ -332,12 +373,21 @@
     updateFieldVisibility();
     renderCalculation();
     saveToLocalStorage();
+    // PS-007 analytics: calc_completed — sekali per sesi perhitungan (re-arm via reset).
+    if (!analyticsState.calcEmitted) {
+      analyticsState.calcEmitted = true;
+      trackEvent('calc_completed', { mode: mode() });
+    }
   }
 
   function onModeChanged() {
     updateFieldVisibility();
     renderCalculation();
     saveToLocalStorage();
+    // PS-007 analytics: mode_switched_pkwt — hanya saat pindah ke PKWT.
+    if (mode() === 'PKWT') {
+      trackEvent('mode_switched_pkwt', { mode: 'PKWT' });
+    }
   }
 
   function resetForm() {
@@ -354,6 +404,9 @@
     if (tg) tg.checked = false;
     var mPkwtt = el('mode-pkwtt');
     if (mPkwtt) mPkwtt.checked = true;
+    // PS-007 analytics: reset meng-arm ulang calc_completed sesi baru.
+    analyticsState.calcEmitted = false;
+    analyticsState.lastGapStatus = null;
     clearSavedState();
     updateFieldVisibility();
     renderCalculation();
