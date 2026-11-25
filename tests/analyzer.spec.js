@@ -97,7 +97,7 @@ test.describe('PS-004 AI Bedah Surat @375x812', () => {
         .filter((h) => !h.includes('fonts.googleapis.com')),
       scripts: Array.from(document.querySelectorAll('script[src]')).map((s) => s.getAttribute('src')),
     }));
-    expect(assets.css).toEqual(['css/styles.css?v=4']);
+    expect(assets.css).toEqual(['css/styles.css?v=5']);
     expect(assets.scripts).toContain('js/analyzer.js?v=2');
   });
 

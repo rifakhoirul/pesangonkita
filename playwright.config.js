@@ -15,5 +15,8 @@ module.exports = {
     headless: true,
     viewport: { width: 375, height: 812 }, // mobile-first acuan utama DS §1
   },
+  // PS-008: project chromium agar `npx playwright test --project=chromium` jalan
+  // (desktop 1280x800 diuji via setViewportSize di dalam spec audit).
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   reporter: [['list']],
 };
